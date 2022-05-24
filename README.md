@@ -178,52 +178,20 @@ thread_sent.start()
 
 Фотографии работ
 =================
-![Alt text](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/task.jpg "Task")
+![Alt text](https://github.com/Dubrovsky18/PythonChat/blob/push/reports/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%20%D0%BE%D1%82%202022-05-25%2001-17-40.png?raw=true "Task")
+
+![Alt text](https://github.com/Dubrovsky18/PythonChat/blob/push/reports/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%20%D0%BE%D1%82%202022-05-25%2001-18-16.png?raw=true "Task")
+
+![Alt text](https://github.com/Dubrovsky18/PythonChat/blob/push/reports/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%20%D0%BE%D1%82%202022-05-25%2001-18-41.png?raw=true "Task")
 
 
+Выводы
+------
+В данной работе я выяснил как должны работать сервера чатов, как устроен 
+socket, осознал логику потоков в Python. Но главное, что я хочу выделить - подготовка
+написания кода. Первым делом стоит разработать план и осознать логику кода, так
+как мы будем общаться с машиной, как иностранцы. Без понятной, и четкой
+грамматики/синктаксиса-структуры нас не поймут. Для масшатабных проектов стоит 
+чертить некие схемы, чтобы видеть наглядно, что делает сервер, что делают клиенты,
+кто куда и зачем отправляет.
 
-
-
-
-
-
-
-
-
-\
---------------------------
-
-![Alt text](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/web1.png "сайт на web1")
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/web2.png "Сайт на web2")
---------------------------
-
-+ Забиваем адрес - Virtual IP([Немного о Keepalived и VI](https://www.servers.ru/knowledge/linux-administration/how-to-setup-floating-ip-using-keepalived)). Если при каждом обновлении он показывает сайт web1, а потом web2, поочередно, следовательно мы сделали все правильно.
-
-\
--------------------------
-
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/haproxy_web1.png "Web1 in haproxy")
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/haproxy_web2.png "Web2 in haproxy")
----------------------------
-
-
-### Проверка на отказоустойчивость
-==================================
-
-+ Выключаем один из backend-server(желательно, чей приоритет выше). Забиваем адрес - Virtual IP. Если при каждом обновлении он показывает сайт web1, а потом web2, поочередно, следовательно мы сделали все правильно.
-
-\
----------------------
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/failover/haproxy1_web1.png "Отказоустойчивасть. Web1 - Основа на haproxy1")
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/failover/haproxy1_web2.png "Отказоустойчивасть. Web2 - Основа на haproxy1")
----------------------------
-
-
-
-+ Включаем один сервер, выключаем другой. Забиваем - Virtual IP.Если при каждом обновлении он показывает сайт web1, а потом web2, поочередно, следовательно мы сделали все правильно.
-
-\
----------------------
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/failover/haproxy2_web1.png "Отказоустойчивасть. Web1 - Основа на haproxy2")
-![Alt-текст](https://github.com/Dubrovsky18/OS_system/blob/main/project_5/report/failover/haproxy2_web2.png "Отказоустойчивасть. Web2 - Основа на haproxy2")
----------------------------
