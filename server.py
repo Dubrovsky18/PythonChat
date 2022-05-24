@@ -27,20 +27,19 @@ def send(to_client, msg):  # Separate function to send the message
 
 def recv(client):  # Separate message receiving function
     msg = client.recv(1024).decode('utf-8')  # Get message from client
-    if msg == 'q' or msg == 'QUIT':  # Checking in quiting user
-        send(client, 'Disconnected')
-        print(f'Disconnected : {list_dict_nickname[client]}')  # Our log
-        delete(client)  # Delete in every dict and list
-        client.close()
-        return False
-    elif msg in ['TELL', 'LIST', 'QUIT', 'HELP']:  # Checking in special word
-        notion(client, msg)
-    else:
-        return msg
+    # if msg == 'q' or msg == 'QUIT':  # Checking in quiting user
+    #     send(client, 'Disconnected')
+    #     print(f'Disconnected : {list_dict_nickname[client]}')  # Our log
+    #     delete(client)  # Delete in every dict and list
+    #     client.close()
+    #     return False
+    # elif msg in ['TELL', 'LIST', 'QUIT', 'HELP']:  # Checking in special word
+    #     notion(client, msg)
+    return msg
 
 
 def send_to_broadcast(nickname, msg):  # Separate function for broadcast communication
-    if msg != 'None':
+    if msg is not 'None':
         for client in list_listen:  # Realization broadcast message
             send(client, f"(broadcast) {nickname}: {msg}")
 
@@ -57,12 +56,12 @@ def start_server():
 def authoruzation(client):  # Function for authoruzation user
     while True:  # Ask until there is a result
         nickname = recv(client) # Ask client about nickname
-        if not nickname in list_dict_client:  # Check nickname in list of nicknames
+        if not nickname in list_nickname:  # Check nickname in list of nicknames
             send(client, "Successfully")
             break
         elif nickname == 'q':  # If client want to exit
             send(client, "Disconnected")
-            client.close()  # If client quit from chat, server close this client
+            client.close() # If client quit from chat, server close this client
             break
         else:
             send(client, "This nickname already used ")  # Option if there is already such nickname
@@ -145,23 +144,22 @@ def notion(client, message):
     LIST       Display users in chat
     QUIT       go out from chat
                     ''')
-    else:
-        return True
 
 
 def chat(client_from, client_to=None, flag=False):
     while True:
         message = recv(client_from)
-        if not message:
-            flag = True
         nick = list_dict_nickname[client_from]
-        if client_to != None:
+        if message in ['TELL', 'LIST', 'QUIT', 'HELP']:
+            notion(client_from, message)
+        elif client_to != None:
             send(client_to, f"(private) {nick} : {message}")
             if flag:
                 break
         else:
             send_to_broadcast(nick, message)
     print('break from ', client_from)
+    client_from.close()
 
 
 parser = argparse.ArgumentParser()
