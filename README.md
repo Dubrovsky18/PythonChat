@@ -112,25 +112,25 @@ def delete(client:socket):
 def send(to_client:socket, msg:str):
 
 # Функция для принятия сообщения и обработки специальных команд
-def recv(client:socket) -> msg:str
+def recv(client:socket) -> str
 
 # Функция для общего чата
-def send_to_broadcast(nickname:str, msg:str)
+def send_to_broadcast(nickname:str, str)
 
 # Функция для ожидания подключения пользователя и отправки его в отдлеьный поток
 def start_server()
 
 # Функция для авторизации пользователя, чтобы не было одинаковых NICKNAME
-def authoruzation(client:socket) -> nickname:str
+def authoruzation(client:socket) -> str
 
 # Функция для приветствия нового пользователя и предоставить ему выбор режима чата
 def welcome(client:socket):
 
 # Функция которая дает пользователю выбрать себе собеседника
-def choose_for_one(client:socket) -> nickname:str
+def choose_for_one(client:socket) -> str
 
 # Функция специальных слов
-def word(client:socket, message:str):
+def word(client:socket, message:str): 
 
 # Функция самого чата, в котором происходят все беседы
 def chat(client_from:socket, client_to:socket , flag: boolean):
