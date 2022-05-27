@@ -14,6 +14,7 @@ broadcast_from_bot = "General information"
 def delete(client):  # Function to delete users, who went out
     nickname_client = list_dict_nickname[client]
     del list_dict_nickname[client]
+    list_nickname.remove(nickname_client)
     try:
         list_listen.remove(client)
     except Exception:
@@ -27,19 +28,20 @@ def send(to_client, msg):  # Separate function to send the message
 
 def recv(client):  # Separate message receiving function
     msg = client.recv(1024).decode('utf-8')  # Get message from client
-    # if msg == 'q' or msg == 'QUIT':  # Checking in quiting user
-    #     send(client, 'Disconnected')
-    #     print(f'Disconnected : {list_dict_nickname[client]}')  # Our log
-    #     delete(client)  # Delete in every dict and list
-    #     client.close()
-    #     return False
-    # elif msg in ['TELL', 'LIST', 'QUIT', 'HELP']:  # Checking in special word
-    #     notion(client, msg)
-    return msg
+    if msg == 'q' or msg == 'QUIT':  # Checking in quiting user
+        send(client, 'Disconnected')
+        print(f'Disconnected : {list_dict_nickname[client]}')  # Our log
+        delete(client)  # Delete in every dict and list
+        client.close()
+        return False
+    elif msg in ['TELL', 'LIST', 'QUIT', 'HELP']:  # Checking in special word
+        word(client, msg)
+    else:
+        return msg
 
 
 def send_to_broadcast(nickname, msg):  # Separate function for broadcast communication
-    if msg is not 'None':
+    if msg != 'None':
         for client in list_listen:  # Realization broadcast message
             send(client, f"(broadcast) {nickname}: {msg}")
 
@@ -48,27 +50,28 @@ def start_server():
     while True:
         client_socket, address = server_socket.accept()  # we accept all connections to server
         print('Connected by' + str(address))  # our local logs
-        thread = threading.Thread(target=chosen, args=(client_socket,))  # Process boring user to chat with other users, then we can retrun to listen new connected users
+        thread = threading.Thread(target=welcome, args=(
+        client_socket,))  # Process boring user to chat with other users, then we can retrun to listen new connected users
         thread.daemon = True  # Our users will be in chat until they wnat to go out
         thread.start()  # start Proceess
 
 
 def authoruzation(client):  # Function for authoruzation user
     while True:  # Ask until there is a result
-        nickname = recv(client) # Ask client about nickname
-        if not nickname in list_nickname:  # Check nickname in list of nicknames
+        nickname = recv(client)  # Ask client about nickname
+        if not nickname in list_dict_client:  # Check nickname in list of nicknames
             send(client, "Successfully")
             break
         elif nickname == 'q':  # If client want to exit
             send(client, "Disconnected")
-            client.close() # If client quit from chat, server close this client
+            client.close()  # If client quit from chat, server close this client
             break
         else:
             send(client, "This nickname already used ")  # Option if there is already such nickname
     return nickname
 
 
-def chosen(client):
+def welcome(client):
     nickname = authoruzation(client)  # Nick from client, witch connected
 
     list_dict_client[nickname] = client  # Add Nick and client to dict with key - nickname
@@ -128,8 +131,7 @@ def choose_for_one(client):
                 send(client, '\n Nobody in chat')
 
 
-
-def notion(client, message):
+def word(client, message):
     nick = list_dict_nickname[client]
     if message == 'TELL':  # Receive a private message
         send(client, f"Who will get your message? \n {list_nickname} \n")
@@ -144,22 +146,25 @@ def notion(client, message):
     LIST       Display users in chat
     QUIT       go out from chat
                     ''')
+    else:
+        return True
 
 
 def chat(client_from, client_to=None, flag=False):
     while True:
-        message = recv(client_from)
-        nick = list_dict_nickname[client_from]
-        if message in ['TELL', 'LIST', 'QUIT', 'HELP']:
-            notion(client_from, message)
-        elif client_to != None:
-            send(client_to, f"(private) {nick} : {message}")
-            if flag:
-                break
-        else:
-            send_to_broadcast(nick, message)
-    print('break from ', client_from)
-    client_from.close()
+        try:
+            message = recv(client_from)
+            if not message:
+                flag = True
+            nick = list_dict_nickname[client_from]
+            if client_to is not None:
+                send(client_to, f"(private) {nick} : {message}")
+                if flag:
+                    break
+            else:
+                send_to_broadcast(nick, message)
+        except Exception:
+            print('break from ', client_from)
 
 
 parser = argparse.ArgumentParser()
