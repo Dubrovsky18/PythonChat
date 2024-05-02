@@ -5,8 +5,8 @@ import threading
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--ip_adress', default='127.0.0.1')
-parser.add_argument('-p', '--port', default='12345')
+parser.add_argument('-i', '--ip_adress', default='194.31.173.242')
+parser.add_argument('-p', '--port', default='30123')
 args = parser.parse_args(sys.argv[1:])
 ip = str(args.ip_adress)
 porting = int(args.port)
@@ -40,12 +40,8 @@ def proces():
 
 def recr():
     global nickname
-    i=0
-    while True:
-        i +=1
-        if i > 250:
-            break
-        try:
+    try:
+        while True:
             data = client_socket.recv(1024)
             msg = data.decode('utf-8')
             if msg == 'process':
@@ -55,25 +51,26 @@ def recr():
                 nickname = "---"
             else:
                 print('\n Входящее сообщение:\n ', msg, '\n')
-        except Exception:
-            client_socket.close()
-            quit()
+    except Exception:
+        client_socket.close()
+        quit()
 
 
 def sent():
     client_socket.send(nickname.encode('utf-8'))
-    while True:
-        try:
+    try:
+        while True:
             message = input(f'\n {nickname}---Ваше сообщение ------ \n')
-            client_socket.send(message.encode('utf-8'))
             if message == 'q' or message == 'QUIT':
-                client_socket.close()
+                print("Exiting chat...")
                 break
-        except Exception:
-            print("Server close")
-            break
-    client_socket.close()
-    quit()
+            client_socket.send(message.encode('utf-8'))
+    except Exception:
+        print("Server closed")
+    finally:
+        client_socket.close()
+        print("Connection closed")
+        quit()
 
 
 client_socket = socket.socket()

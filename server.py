@@ -23,7 +23,11 @@ def delete(client):  # Function to delete users, who went out
 
 
 def send(to_client, msg):  # Separate function to send the message
-    to_client.send(msg.encode('utf-8'))
+    try:
+        to_client.send(msg.encode('utf-8'))
+    except socket.error as e:
+        print(f"Error sending message to {to_client}: {e}")
+        delete(to_client)  # Clean up client data if an error occurs
 
 
 def recv(client):  # Separate message receiving function
@@ -34,16 +38,15 @@ def recv(client):  # Separate message receiving function
         delete(client)  # Delete in every dict and list
         client.close()
         return False
-    elif msg in ['TELL', 'LIST', 'QUIT', 'HELP']:  # Checking in special word
+    elif msg in ['TELL', 'LIST', 'HELP']:  # Checking in special word
         word(client, msg)
     else:
         return msg
 
 
 def send_to_broadcast(nickname, msg):  # Separate function for broadcast communication
-    if msg != 'None':
-        for client in list_listen:  # Realization broadcast message
-            send(client, f"(broadcast) {nickname}: {msg}")
+    for client in list_listen:  # Realization broadcast message
+        send(client, f"(broadcast) {nickname}: {msg}")
 
 
 def start_server():
@@ -93,13 +96,15 @@ If you want to communicate with your friend, we advise you to wait a few seconds
     LIST       Display users in chat
     QUIT       go out from chat
     """)
-    time.sleep(2)
+    time.sleep(1)
     send(client,
          "What are you want: 1. send to one user or 2. inside to group ")  # Each client can choose(private message)
     num = recv(client)
     if num == "1":  # choice mode with private message
         client_to_one_connect = choose_for_one(client)  # User need choose interlocutor
         chat(client, client_to_one_connect)  # function for privet chat (from whom, to whom, flag for private message)
+    elif num == "q" or num == "QUIT":
+        client.close()
     else:
         list_listen.append(client)  # User added to list, witch tell, who will get message
         send(client, " You in group ")
@@ -136,9 +141,15 @@ def word(client, message):
     if message == 'TELL':  # Receive a private message
         send(client, f"Who will get your message? \n {list_nickname} \n")
         username = recv(client)
-        chat(client, list_dict_client[username], True)
+        if username not in list_dict_nickname:
+            send(client, "We don't have this person")
+        else:
+            chat(client, list_dict_client[username], True)
     elif message == 'LIST':  # Message with a list of nicknames
         send(client, f'Users in chatroom: {list_nickname}')
+    elif message == 'QUIT':
+        send(client, "Bye bye")
+        client.close()
     elif message == 'HELP':  # Message with a list of available commands
         send(client, '''
     A list of available commands:
@@ -146,30 +157,25 @@ def word(client, message):
     LIST       Display users in chat
     QUIT       go out from chat
                     ''')
-    else:
-        return True
 
-
-def chat(client_from, client_to=None, flag=False):
-    while True:
-        try:
+def chat(client_from, client_to=None):
+    try:
+        while True:
             message = recv(client_from)
-            if not message:
-                flag = True
             nick = list_dict_nickname[client_from]
             if client_to is not None:
                 send(client_to, f"(private) {nick} : {message}")
-                if flag:
-                    break
             else:
                 send_to_broadcast(nick, message)
-        except Exception:
-            print('break from ', client_from)
+    except Exception:
+        delete(client_from)
+        print('break from ', client_from)
+            
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--ip_address', default='127.0.0.1')
-parser.add_argument('-p', '--port', default='12345')
+parser.add_argument('-i', '--ip_address', default='194.31.173.242')
+parser.add_argument('-p', '--port', default='30123')
 args = parser.parse_args(sys.argv[1:])
 ip = str(args.ip_address)
 porting = int(args.port)
